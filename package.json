@@ -1,0 +1,75 @@
+{
+  "name": "@argszero/dsh-effort-default-fallback",
+  "description": "A reasoning ladder with no declared default leaves every unnamed call on that route with no reasoning parameter, and llm-pi-ai reads a missing parameter as explicit off — so a toggle model (Xiaomi MiMo, Moonshot/Kimi) does not think while its effort menu shows a synthetic 'Default'. Publishing a real default is the documented workaround, but the llm-pi-ai provider profile is a per-provider knob: a gateway whose models differ cannot be configured model by model. This plugin shadows the three LlmRuntime methods the absence is read through — resolveModelInfo (the model picker's source), resolveCallConfig (installing a session's selection) and prepareCall (the turn itself) — and fills the default for exactly the routes an operator lists, only where the route declares a ladder, admits the level and has no default of its own. An unlisted route, a route with no ladder, a route that declares its own default, a level the ladder refuses, a route whose adapter throws and a call that already names an effort are all left exactly as they were, each counted by rule; configuration is refused rather than repaired; mode observe (the default) counts the same decisions and changes nothing. Zero runtime dependencies, fail-open, no sandbox changes.",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*.js",
+    "lib/types/**/*.d.ts",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argszero/dsh-effort-default-fallback.git"
+  },
+  "homepage": "https://github.com/argszero/dsh-effort-default-fallback#readme",
+  "bugs": {
+    "url": "https://github.com/argszero/dsh-effort-default-fallback/issues"
+  },
+  "keywords": [
+    "cordis",
+    "deepseek-harness",
+    "dsh",
+    "plugin",
+    "llm",
+    "reasoning-effort",
+    "reasoningEffort",
+    "default-effort",
+    "llm-pi-ai",
+    "toggle-model",
+    "mimo",
+    "kimi"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5-alpha.1",
+    "@deepseek-ai/dsh-llm": ">=0.2.1-alpha.2 <0.3.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5-alpha.2",
+    "@deepseek-ai/dsh-llm": "0.2.1-alpha.3",
+    "@types/node": "^24.19.1",
+    "semver": "^7.8.5",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "pretest": "tsc",
+    "test": "node --test \"test/*.spec.mjs\"",
+    "test:inject": "node scripts/inject-defects.mjs",
+    "test:probe-lines": "node scripts/probe-lines.mjs",
+    "prepublishOnly": "tsc"
+  },
+  "engines": {
+    "node": "^22.19 || >=24"
+  }
+}

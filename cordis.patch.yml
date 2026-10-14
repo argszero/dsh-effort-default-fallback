@@ -1,0 +1,60 @@
+# The @argszero/dsh-effort-default-fallback bundle patch: mount, then measure.
+#
+# A reasoning ladder with no declared default leaves every unnamed call on that
+# route with no reasoning parameter at all, and `llm-pi-ai` reads a missing
+# parameter as explicit `off`:
+#
+#   packages/llm/llm-pi-ai/src/adapter.ts
+#     reasoningInfo(model, defaultLevel) publishes `efforts` whenever the model
+#     carries reasoning metadata, and `defaultEffort` **only** when the
+#     deployment configured one (`describableReasoningLevel(resolvedModel,
+#     profile.reasoning)`).
+#
+#   packages/llm/llm/src/index.ts
+#     const effective = requested ?? reasoning.defaultEffort
+#
+# With `defaultEffort` absent and nothing requested, nothing is resolved, so the
+# request goes out with no reasoning parameter and the model does not think —
+# while the effort menu still shows a synthetic **Default** row, in front of the
+# real levels. That is the state every fresh third-party gateway is in, and it is
+# what the report behind this plugin describes for the toggle models (Xiaomi
+# MiMo, Moonshot / Kimi).
+#
+# The documented workaround is the `llm-pi-ai` provider profile
+# (`providers.<id>.reasoning: high`), which makes the adapter publish the level
+# and fixes all three surfaces that read the absence — the model picker, the
+# session's stored selection, and the turn. It is a **per-provider** knob: the
+# profile type carries `reasoning` once per provider and a per-model map only for
+# `maxTokens`, so turning it on for one toggle model turns it on for every model
+# behind that gateway.
+#
+# This plugin fills the absence per route instead, by shadowing the three
+# `LlmRuntime` methods those surfaces read — `resolveModelInfo`,
+# `resolveCallConfig` and `prepareCall` — on the service instance. It answers
+# only for the routes listed below, and only where the route declares a ladder,
+# admits the level and declares no default of its own; everything else is left
+# exactly as the harness left it.
+#
+# The shipped `mode` is `observe`: the listed routes are counted by outcome and
+# nothing is changed, which is how you measure what the plugin would do on your
+# deployment before trusting it with a repair. Change it to `enforce` once the
+# log says what you expect. With no `defaults` — the state below — no route is
+# listed, so nothing is judged at all:
+#
+#   mode: enforce
+#   defaults:
+#     xiaomi: high                       # every model behind this provider
+#     moonshot/kimi-k2-thinking: medium  # or one exact route
+#
+# The plugin has no runtime dependency: it reaches the service through
+# `ctx.get('llm')` and asks it for a route's capability, so it never imports a
+# harness package for value. That is deliberate — in a `profile` deployment a
+# plugin's own dependency can materialize a second copy of a harness package, a
+# failure this repository has already shipped more than once.
+
+- insert:
+    - id: effort-default-fallback
+      name: '@argszero/dsh-effort-default-fallback'
+      config:
+        mode: observe
+        defaults: {}
