@@ -1,7 +1,7 @@
 {
   "name": "@argszero/dsh-effort-default-fallback",
   "description": "A reasoning ladder with no declared default leaves every unnamed call on that route with no reasoning parameter, and llm-pi-ai reads a missing parameter as explicit off — so a toggle model (Xiaomi MiMo, Moonshot/Kimi) does not think while its effort menu shows a synthetic 'Default'. Publishing a real default is the documented workaround, but the llm-pi-ai provider profile is a per-provider knob: a gateway whose models differ cannot be configured model by model. This plugin shadows the three LlmRuntime methods the absence is read through — resolveModelInfo (the model picker's source), resolveCallConfig (installing a session's selection) and prepareCall (the turn itself) — and fills the default for exactly the routes an operator lists, only where the route declares a ladder, admits the level and has no default of its own. An unlisted route, a route with no ladder, a route that declares its own default, a level the ladder refuses, a route whose adapter throws and a call that already names an effort are all left exactly as they were, each counted by rule; configuration is refused rather than repaired; mode observe (the default) counts the same decisions and changes nothing. Zero runtime dependencies, fail-open, no sandbox changes.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publishConfig": {
     "access": "public"
   },
